@@ -15,7 +15,7 @@ import java.util.Map;
 public class JWTTokenProvider {
     public static final Logger LOG = LoggerFactory.getLogger(JWTTokenProvider.class);
 
-    public String generateToken(Authentication authentication){
+    public String generateToken(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
         Date now = new Date(System.currentTimeMillis());
         Date expiryDate = new Date(now.getTime() + SecurityConstants.EXPIRATION_TIME);
@@ -37,23 +37,24 @@ public class JWTTokenProvider {
                 .compact();
 
     }
-    public boolean validateToken(String token){
+
+    public boolean validateToken(String token) {
         try {
             Jwts.parser()
                     .setSigningKey(SecurityConstants.SECRET)
                     .parseClaimsJws(token);
             return true;
-        }catch (SecurityException |
-                MalformedJwtException|
+        }catch (SignatureException |
+                MalformedJwtException |
                 ExpiredJwtException |
                 UnsupportedJwtException |
-                IllegalArgumentException exception){
-            LOG.error(exception.getMessage());
+                IllegalArgumentException ex) {
+            LOG.error(ex.getMessage());
             return false;
         }
     }
 
-    public Long getUserIdFromToken(String token){
+    public Long getUserIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(SecurityConstants.SECRET)
                 .parseClaimsJws(token)

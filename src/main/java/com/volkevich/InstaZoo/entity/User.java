@@ -12,15 +12,16 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
-@Data
 @Entity
+@Data
 public class User implements UserDetails {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private String name;
-    @Column(unique = true,updatable = true)
+    @Column(unique = true, updatable = false)
     private String username;
     @Column(nullable = false)
     private String lastname;
@@ -34,10 +35,11 @@ public class User implements UserDetails {
     @ElementCollection(targetClass = ERole.class)
     @CollectionTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"))
-    private Set<ERole> role = new HashSet<>();
+    private Set<ERole> roles = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "user", orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
+
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     @Column(updatable = false)
     private LocalDateTime createdDate;
@@ -45,27 +47,7 @@ public class User implements UserDetails {
     @Transient
     private Collection<? extends GrantedAuthority> authorities;
 
-    public User(){
-
-    }
-
-    @PrePersist
-    protected void onCreate(){
-        this.createdDate = LocalDateTime.now();
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    /**
-     *
-     * SECURITY
-     */
-    @Override
-    public String getPassword(){
-        return password;
+    public User() {
     }
 
     public User(Long id,
@@ -78,6 +60,27 @@ public class User implements UserDetails {
         this.email = email;
         this.password = password;
         this.authorities = authorities;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = LocalDateTime.now();
+    }
+
+    /**
+     * SECURITY
+     */
+
+
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
     }
 
     @Override

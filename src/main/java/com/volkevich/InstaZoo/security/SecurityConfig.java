@@ -21,7 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(
         securedEnabled = true,
         jsr250Enabled = true,
-        proxyTargetClass = true
+        prePostEnabled = true
 )
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
@@ -32,9 +32,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and().authorizeRequests()
+                .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .authorizeRequests()
                 .antMatchers(SecurityConstants.SIGN_UP_URLS).permitAll()
                 .anyRequest().authenticated();
 
@@ -53,12 +55,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    BCryptPasswordEncoder bCryptPasswordEncoder(){
+    BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public JWTAuthenticationFilter jwtAuthenticationFilter(){
+    public JWTAuthenticationFilter jwtAuthenticationFilter() {
         return new JWTAuthenticationFilter();
     }
 }
